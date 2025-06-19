@@ -6,27 +6,27 @@ import { GetPosts } from "../api";
 import { CircularProgress } from "@mui/material";
 
 const Container = styled.div`
-  padding: 30px 30px;
+  padding: 30px;
   padding-bottom: 200px;
-  height: 100%;
-  overflow-y: scroll;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  @media (max-width: 768px) {
-    padding: 6px 10px;
-  }
   background: ${({ theme }) => theme.background};
+
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
 `;
 
 const HeadLine = styled.div`
   font-size: 34px;
   font-weight: 500;
   color: ${({ theme }) => theme.text_primary};
+  text-align: center;
   display: flex;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
 `;
 
 const Span = styled.div`
@@ -37,7 +37,7 @@ const Span = styled.div`
 
 const Wrapper = styled.div`
   width: 100%;
-  max-width: 1400px;
+  max-width: 1200px;
   padding: 32px 0px;
   display: flex;
   justify-content: center;
@@ -46,19 +46,42 @@ const Wrapper = styled.div`
 
 const CardWrapper = styled.div`
   display: grid;
+  width: 100%;
   gap: 20px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 4px;
 
   @media (min-width: 1200px) {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
   }
 
   @media (min-width: 640px) and (max-width: 1199px) {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 
   @media (max-width: 639px) {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  @media (max-width: 400px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: white;
+    border-radius: 10px;
+  }
+`;
+
+const Message = styled.div`
+  color: ${({ theme }) => theme.text_secondary};
+  font-size: 1.1rem;
+  text-align: center;
+  margin-top: 40px;
 `;
 
 const Home = () => {
@@ -70,16 +93,16 @@ const Home = () => {
 
   const getPosts = async () => {
     setLoading(true);
-    await GetPosts()
-      .then((res) => {
-        setPosts(res?.data?.data);
-        setFilteredPost(res?.data?.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setError(error?.response?.data?.message);
-        setLoading(false);
-      });
+    try {
+      const res = await GetPosts();
+      const data = res?.data?.data;
+      setPosts(data);
+      setFilteredPost(data);
+    } catch (error) {
+      setError(error?.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -89,18 +112,18 @@ const Home = () => {
   useEffect(() => {
     if (!search) {
       setFilteredPost(posts);
+      return;
     }
-    const filteredPosts = posts.filter((post) => {
-      const promptMatch = post?.prompt?.toLowerCase().includes(search);
-      const authorMatch = post?.name?.toLowerCase().includes(search);
 
+    const lowerSearch = search.toLowerCase();
+    const filtered = posts.filter((post) => {
+      const promptMatch = post?.prompt?.toLowerCase().includes(lowerSearch);
+      const authorMatch = post?.name?.toLowerCase().includes(lowerSearch);
       return promptMatch || authorMatch;
     });
 
-    if (search) {
-      setFilteredPost(filteredPosts);
-    }
-  }, [posts, search]);
+    setFilteredPost(filtered);
+  }, [search, posts]);
 
   return (
     <Container>
@@ -108,27 +131,32 @@ const Home = () => {
         Explore popular posts in the Community!
         <Span>⦾ Generated with AI ⦾</Span>
       </HeadLine>
+
       <SearchBar
         search={search}
         handleChange={(e) => setSearch(e.target.value)}
       />
+
       <Wrapper>
-        {error && <div style={{ color: "red" }}>{error}</div>}
+        {error && <Message style={{ color: "red" }}>{error}</Message>}
+
         {loading ? (
           <CircularProgress />
         ) : (
           <CardWrapper>
             {filteredPost.length > 0 ? (
-              <>
-                {filteredPost
-                  .slice()
-                  .reverse()
-                  .map((item, index) => (
-                    <ImageCard key={index} item={item} />
-                  ))}
-              </>
+              filteredPost
+                .slice()
+                .reverse()
+                .map((item, index) => (
+                  <ImageCard
+                    key={index}
+                    item={item}
+                    large={index === 0} // make last item large (now rendered first)
+                  />
+                ))
             ) : (
-              <>No Posts Found !!</>
+              <Message>No Posts Found 😞</Message>
             )}
           </CardWrapper>
         )}

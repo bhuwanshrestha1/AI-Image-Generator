@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import Avatar from '@mui/material/Avatar';
 import { DownloadRounded } from '@mui/icons-material';
@@ -12,16 +12,26 @@ const Card = styled.div`
   box-shadow: 1px 2px 40px 8px ${({ theme }) => theme.black + '60'};
   cursor: pointer;
   transition: all 0.3s ease;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 
   &:hover {
     box-shadow: 1px 2px 40px 8px ${({ theme }) => theme.black + '80'};
-    transform: scale(1.05);
+    transform: scale(1.03);
   }
 
-  &:nth-child(7n + 1) {
-    grid-column: auto / span 2;
-    grid-row: auto / span 2;
-  }
+  ${(props) =>
+    props.large &&
+    css`
+      grid-column: span 2;
+      grid-row: span 2;
+
+      @media (max-width: 768px) {
+        grid-column: span 1;
+        grid-row: span 1;
+      }
+    `}
 `;
 
 const HoverOverlay = styled.div`
@@ -63,11 +73,11 @@ const Author = styled.div`
   font-size: 14px;
 `;
 
-const ImageCard = ({ item }) => {
+const ImageCard = ({ item, large }) => {
   return (
-    <Card>
+    <Card large={large}>
       <LazyLoadImage
-        style={{borderRadius: '12px'}}
+        style={{ borderRadius: '12px' }}
         width="100%"
         effect="blur"
         src={item?.photo}
