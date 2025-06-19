@@ -37,9 +37,11 @@ HuggingFace API (for AI image generation)
 MongoDB & Mongoose (for database)
 
 # Screenshots
-![Screenshot 2025-06-19 130600](https://github.com/user-attachments/assets/18f9ea09-0f54-4ba1-a603-dff007981b42)
+![Screenshot 2025-06-19 130600](https://github.com/user-attachments/assets/c57a3c20-15f8-4082-8b53-4d4d118e381b)
 
-![Screenshot 2025-06-19 130615](https://github.com/user-attachments/assets/8a47ceab-79a4-4435-8531-72b2bd40e337)
+
+![Screenshot 2025-06-19 130615](https://github.com/user-attachments/assets/cb8a34bd-b7f0-4d7a-a6c1-c17afc2ed5e9)
+
 
 # 🌐 Getting Started
 ## Prerequisites
